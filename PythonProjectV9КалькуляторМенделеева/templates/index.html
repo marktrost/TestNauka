@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Подготовка к ЕНТ{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1>Подготовка к ЕНТ 🎓</h1>
+    <p class="lead">Выберите направление для подготовки</p>
+    
+    <div class="row mt-5">
+        {% for block in blocks %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h4>{{ block.name }}</h4>
+                    <p>Тестовые варианты для подготовки</p>
+                    <a href="{{ url_for('block_variants', block_id=block.id) }}" class="btn btn-primary">
+                        Выбрать вариант →
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
