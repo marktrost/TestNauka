@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Варианты - {{ block.name }}{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Главная</a></li>
+    <li class="breadcrumb-item active">{{ block.name }} - Варианты</li>
+{% endblock %}
+
+{% block content %}
+<div class="text-center py-4">
+    <h2>{{ block.name }}</h2>
+    <p class="lead">Выберите вариант теста</p>
+</div>
+
+<div class="row">
+    {% if variants %}
+        {% for variant in variants %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h4>{{ variant.name }}</h4>
+                    <p class="text-muted">Тестовый вариант</p>
+                    <a href="{{ url_for('take_test', variant_id=variant.id) }}" class="btn btn-primary">
+                        Начать тест →
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-warning text-center">
+                <h4>В этом блоке пока нет вариантов</h4>
+                <p>Администратор еще не добавил тестовые варианты</p>
+                <a href="{{ url_for('admin_blocks') }}" class="btn btn-outline-primary">
+                    Перейти в админку
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="mt-4 text-center">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">← Назад к блокам</a>
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Ответы на вопрос{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{{ url_for('admin_blocks') }}">Блоки</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('admin_variants', block_id=question.block_id) }}">{{ question.block_name }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('admin_subjects', variant_id=question.variant_id) }}">{{ question.variant_name }} - Предметы</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('admin_questions', subject_id=question.subject_id) }}">{{ question.subject_name }} - Вопросы</a></li>
+    <li class="breadcrumb-item active">Ответы</li>
+{% endblock %}
+
+{% block header_actions %}
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAnswerModal">
+        + Добавить ответ
+    </button>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h5>Вопрос: {{ question.text|truncate(50) }}</h5>
+        <p class="mb-0 text-muted">Предмет: {{ question.subject_name }} | Вариант: {{ question.variant_name }} | Блок: {{ question.block_name }}</p>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info">
+            <strong>Вопрос полностью:</strong><br>
+            {{ question.text }}
+        </div>
+
+        {% if answers %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Текст ответа</th>
+                            <th>Правильный</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for answer in answers %}
+                        <tr class="{% if answer.is_correct %}table-success{% endif %}">
+                            <td>{{ answer.id }}</td>
+                            <td>
+                                <div class="answer-text">{{ answer.text }}</div>
+                            </td>
+                            <td>
+                                {% if answer.is_correct %}
+                                    <span class="badge bg-success">✅ Правильный</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">❌ Неправильный</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('edit_answer', answer_id=answer.id) }}" class="btn btn-sm btn-warning">
+                                    ✏️ Редактировать
+                                </a>
+                                <a href="{{ url_for('toggle_answer', answer_id=answer.id) }}?question_id={{ question.id }}" class="btn btn-sm btn-outline-primary">
+                                    {% if answer.is_correct %}❌ Сделать неправильным{% else %}✅ Сделать правильным{% endif %}
+                                </a>
+                                <form action="{{ url_for('delete_answer', answer_id=answer.id) }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="question_id" value="{{ question.id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Удалить этот ответ?')">
+                                        🗑️ Удалить
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="alert alert-warning mt-3">
+                <strong>💡 Подсказка:</strong> У вопроса может быть несколько правильных ответов!
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <h4>К этому вопросу пока нет ответов</h4>
+                <p class="text-muted">Добавьте первый ответ</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Модальное окно добавления ответа -->
+<div class="modal fade" id="addAnswerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавить ответ к вопросу</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_answer', question_id=question.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="answerText" class="form-label">Текст ответа:</label>
+                        <textarea class="form-control" id="answerText" name="text"
+                                  rows="3" placeholder="Введите текст ответа..." required></textarea>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="isCorrect" name="is_correct">
+                        <label class="form-check-label" for="isCorrect">
+                            Это правильный ответ
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить ответ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.answer-text {
+    max-width: 300px;
+    word-wrap: break-word;
+}
+</style>
+{% endblock %}

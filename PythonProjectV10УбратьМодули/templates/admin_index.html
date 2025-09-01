@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Главная панель управления{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">Главная</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>Добро пожаловать в админку подготовки к ЕНТ! 🎓</h3>
+                <p class="lead">Используйте панель навигации для управления контентом</p>
+                
+                <div class="row mt-5 justify-content-center">
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>🍽️ Управление контентом</h5>
+                                <p>Блоки, варианты, предметы, вопросы и ответы</p>
+                                <a href="{{ url_for('admin_blocks') }}" class="btn btn-primary">Начать работу</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

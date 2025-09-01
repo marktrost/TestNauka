@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Личный кабинет - {{ session.username }}{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">📊 Личный кабинет</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Левая колонка - статистика -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>👤 Профиль</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="avatar mb-3">
+                    <span style="font-size: 3rem;">🎓</span>
+                </div>
+                <h4>{{ session.username }}</h4>
+                <p class="text-muted">Участник с {{ user_data.created_at[:10] }}</p>
+
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border rounded p-2">
+                            <h5 class="mb-0">{{ total_tests }}</h5>
+                            <small>Тестов</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="border rounded p-2">
+                            <h5 class="mb-0">{{ average_percentage|round(1) }}%</h5>
+                            <small>Средний</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Прогресс по предметам -->
+        <div class="card">
+            <div class="card-header">
+                <h5>📚 Прогресс по предметам</h5>
+            </div>
+            <div class="card-body">
+                {% for progress in subject_progress %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>{{ progress.subject_name }}</span>
+                        <small class="fw-bold">{{ progress.correct_answered }}/{{ progress.total_answered }}</small>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        {% set percent = (progress.correct_answered / progress.total_answered * 100) if progress.total_answered > 0 else 0 %}
+                        <div class="progress-bar {% if percent >= 80 %}bg-success{% elif percent >= 50 %}bg-warning{% else %}bg-danger{% endif %}"
+                             style="width: {{ percent }}%">
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ percent|round(1) }}%</small>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">Пока нет данных</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Правая колонка - история и графики -->
+    <div class="col-md-8">
+        <!-- Статистика -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h2>⏱️</h2>
+                        <h4>{{ total_time|round(1) }}ч</h4>
+                        <small>Время обучения</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h2>✅</h2>
+                        <h4>{{ total_correct }}</h4>
+                        <small>Правильных ответов</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h2>📈</h2>
+                        <h4>{{ best_score }}%</h4>
+                        <small>Лучший результат</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- История тестов -->
+        <div class="card">
+            <div class="card-header">
+                <h5>📋 История тестов</h5>
+            </div>
+            <div class="card-body">
+                {% if test_results %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Вариант</th>
+                                <th>Результат</th>
+                                <th>Время</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in test_results %}
+                            <tr>
+                                <td>{{ result.completed_at[:16] }}</td>
+                                <td>{{ result.variant_name }}</td>
+                                <td>
+                                    <span class="badge bg-{% if result.percentage >= 70 %}success{% elif result.percentage >= 50 %}warning{% else %}danger{% endif %}">
+                                        {{ result.score }}/{{ result.total_questions }} ({{ result.percentage|round(1) }}%)
+                                    </span>
+                                </td>
+                                <td>{{ (result.time_spent / 60)|round(1) }} мин.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <h5>📝 Пока нет пройденных тестов</h5>
+                    <p class="text-muted">Начните подготовку к ЕНТ прямо сейчас!</p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">Начать тест</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
